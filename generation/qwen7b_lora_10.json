@@ -1,0 +1,92 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "strategy": "lora",
+  "prompt": {
+    "system": "You are a synthetic data generator API. Output ONLY a valid JSON object.\nNo thinking, no reasoning, no explanation, no text before or after.\nAny output outside the JSON block is a failure.",
+    "user": "Generate EXACTLY one NEW synthetic credit card transaction record.\n\n# SCHEMA\n| Field | Type | Constraints |\n|-------|------|-------------|\n| Unnamed: 0 | int | range [0, 1296674] |\n| cc_num | int | range [60416207185, 4992346398065154048] |\n| merchant | string | format: \"fraud_[Surname] LLC\", \"fraud_[Surname] PLC\", \"fraud_[Surname] Ltd\", \"fraud_[Surname] Inc\", \"fraud_[Surname] Group\", \"fraud_[Surname]-[Surname]\", \"fraud_[Surname], [Surname] and [Surname]\" |\n| category | string | one of: gas_transport, grocery_pos, home, shopping_pos, kids_pets, shopping_net, entertainment, food_dining, personal_care, health_fitness, misc_pos, misc_net, grocery_net, travel |\n| amt | float | range [1.00, 28948.90], 2 decimal places, heavily right-skewed: 25th pct=9.65, median=47.52, 75th pct=83.14, mean=70.35; most values between 5.00 and 150.00, rarely above 500.00 |\n| first | string | common US first name |\n| last | string | common US surname |\n| gender | string | \"F\" or \"M\" |\n| street | string | realistic US street address, formats: \"123 Name St\", \"456 Name Ave Apt. 789\", \"789 Name Blvd Suite 012\" |\n| city | string | US city consistent with state |\n| state | string | 2-letter US state code |\n| zip | str | **string**, range [1257, 99783], consistent with state; low zip (East Coast) correlates with long near -70, high zip (West Coast) correlates with long near -120 |\n| lat | float | range [20.027, 66.693], mean 38.538, consistent with city/state |\n| long | float | range [-165.672, -67.950], mean -90.226, consistent with city/state, strongly negatively correlated with zip |\n| city_pop | int | range [23, 2906700], heavily right-skewed: 25th pct=743, median=2456, 75th pct=20328 |\n| job | string | realistic English job title |\n| dob | string | format \"YYYY-MM-DD\", birth years 1940–1994 (cardholder must be at least 18 at time of transaction) |\n| trans_num | string | exactly 32 lowercase hex characters, no dashes |\n| unix_time | int | range [1325376018, 1371816817], median 1349249747 |\n| merch_lat | float | near lat, difference typically < 1.0 degree |\n| merch_long | float | near long, difference typically < 0.3 degrees |\n| is_fraud | int | 0 with ~99.4% probability, 1 with ~0.6% probability |\n| merch_zipcode | str | **string**, present ~84.9% of the time (**\"\"** when absent, never null), range [1001, 99403], near zip |\n\n# CONSTRAINTS\n1. city, state, zip, lat, long must be geographically consistent with each other\n2. merch_lat ≈ lat (difference < 1.0)\n3. merch_long ≈ long (difference < 0.3)\n4. merch_zipcode when not null must be near zip (within ±20000)\n5. trans_num must be exactly 32 lowercase hex characters\n6. zip and merch_zipcode MUST always be JSON strings. Output \"\" (empty string) for merch_zipcode when the value is absent; never use JSON null, the string \"null\", or NaN.\n11. zip must be output as a zero-padded string if necessary (e.g. \"01257\" not 1257), matching real US ZIP format.\n8. dob must produce an age ≥ 18 relative to the transaction date\n9. Every field must be freshly generated, do NOT copy or reuse values from the examples\n10. Randomize all fields: names, location, merchant, amount, date, trans_num must all be unique\n11. Output must be strictly valid JSON: all numeric values must be plain numbers with no leading zeros, no underscores, no thousand separators, and no code-like syntax of any kind.",
+    "assistant": "```json\n"
+  },
+  "dataset_name": "pointe77/credit-card-transaction",
+  "dataset_seed": 42,
+  "dataset_dir": "dataset",
+  "output_dir": "outputs",
+  "datasets": [
+    {
+      "file": "cct_ft_100pct.json",
+      "description": "Fine-Tuning 100%",
+      "sample": null
+    },
+    {
+      "file": "cct_ft_50pct.json",
+      "description": "Fine-Tuning 50%",
+      "sample": 0.5
+    },
+    {
+      "file": "cct_ft_10pct.json",
+      "description": "Fine-Tuning 10%",
+      "sample": 0.1
+    },
+    {
+      "file": "cct_icl_fs_10r.json",
+      "description": "Few-shot ICL 10 records",
+      "sample": 10
+    },
+    {
+      "file": "cct_icl_fs_5r.json",
+      "description": "Few-shot ICL 5 records",
+      "sample": 5
+    },
+    {
+      "file": "cct_icl_fs_1r.json",
+      "description": "Few-shot ICL 1 record",
+      "sample": 1
+    }
+  ],
+  "dataset": "dataset/cct_ft_10pct.json",
+  "required_fields": {
+    "Unnamed: 0": "int",
+    "cc_num": "int",
+    "merchant": "str",
+    "category": "str",
+    "amt": "float",
+    "first": "str",
+    "last": "str",
+    "gender": "str",
+    "street": "str",
+    "city": "str",
+    "state": "str",
+    "zip": "str",
+    "lat": "float",
+    "long": "float",
+    "city_pop": "int",
+    "job": "str",
+    "dob": "str",
+    "trans_num": "str",
+    "unix_time": "int",
+    "merch_lat": "float",
+    "merch_long": "float",
+    "is_fraud": "int",
+    "merch_zipcode": "str"
+  },
+  "nullable_fields": ["merch_zipcode"],
+  "drop_columns": ["trans_date_trans_time"],
+  "str_fillna_columns": ["zip"],
+  "int_to_str_columns": ["merch_zipcode"],
+  "str_to_int_columns": [],
+  "str_to_float_columns": [],
+  "float_to_int_columns": [],
+  "seed": 0,
+  "num_samples": 10000,
+  "max_new_tokens": 1024,
+  "batch_size": 8,
+  "max_grad_norm": 1,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "repetition_penalty": 1.05,
+  "lora_r": 8,
+  "lora_alpha": 16,
+  "lora_dropout": 0.05,
+  "learning_rate": 0.0001,
+  "epochs": 1,
+  "dp": false
+}

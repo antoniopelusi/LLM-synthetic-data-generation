@@ -11,6 +11,7 @@ The project follows a three-step process using the [pointe77/credit-card-transac
     - Few-shot In-Context Learning (10 records)
     - LoRA Fine-Tuning (10% of the dataset)
     - LoRA Fine-Tuning (50% of the dataset)
+> Note: Each of these generation strategies can be executed both with and without Differential Privacy (DP) by toggling the dedicated DP flag in the configuration.
 
 3. [**Synthetic Data Comparison and Evaluation**](comparison/comparison.ipynb): Comparing synthetic results against the ground truth using statistical metrics and qualitative inspection.
 
