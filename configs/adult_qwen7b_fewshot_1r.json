@@ -1,0 +1,124 @@
+{
+  "dataset_name": "scikit-learn/adult-census-income",
+  "dataset_seed": 0,
+  "dataset_dir": "../dataset",
+  "output_dir": "../outputs",
+  "original_dataset": "adult_ft_100pct.json",
+  "drop_columns": [],
+  "str_fillna_columns": [],
+  "int_to_str_columns": [],
+  "str_to_int_columns": [],
+  "str_to_float_columns": [],
+  "float_to_int_columns": [],
+  "num_cols": [
+    "age",
+    "fnlwgt",
+    "education.num",
+    "capital.gain",
+    "capital.loss",
+    "hours.per.week"
+  ],
+  "cat_cols": [
+    "workclass",
+    "education",
+    "marital.status",
+    "occupation",
+    "relationship",
+    "race",
+    "sex",
+    "native.country",
+    "income"
+  ],
+  "nn_cols": [
+    "age",
+    "fnlwgt",
+    "education.num",
+    "capital.gain",
+    "capital.loss",
+    "hours.per.week"
+  ],
+  "label_analysis": {
+    "enabled": false
+  },
+  "geo_analysis": {
+    "enabled": false
+  },
+  "temporal_analysis": {
+    "enabled": false
+  },
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "strategy": "few_shot_icl_1r",
+  "prompt": {
+    "system": "You are a synthetic data generator API. Output ONLY a valid JSON object.\nNo thinking, no reasoning, no explanation, no text before or after.\nAny output outside the JSON block is a failure.",
+    "user": "Generate EXACTLY one NEW synthetic census income record.\n\n# SCHEMA\n\n## Numeric\n\n| Field | Type | Range | Distribution | Relations |\n|---|---|---|---|---|\n| age | int | [17, 90] | q25=28, median=37, q75=48, mean=38.58 | — |\n| fnlwgt | int | [12285, 1484705] | q25=117827, median=178356, q75=237051, mean=189778.37 | — |\n| education.num | int | [1, 16] | q25=9, median=10, q75=12, mean=10.08 | ordinal code of education, one-to-one with education |\n| capital.gain | int | [0, 99999] | q25=0, median=0, q75=0, mean=1077.65, zeros: 91.7% | never positive together with capital.loss |\n| capital.loss | int | [0, 4356] | q25=0, median=0, q75=0, mean=87.30, zeros: 95.3% | never positive together with capital.gain |\n| hours.per.week | int | [1, 99] | q25=40, median=40, q75=45, mean=40.44 | — |\n\n## Categorical\n\n| Field | Type | Values | Distribution | Relations |\n|---|---|---|---|---|\n| workclass | str | \"Private\", \"Self-emp-not-inc\", \"Local-gov\", \"?\", \"State-gov\", \"Self-emp-inc\", \"Federal-gov\", \"Without-pay\", \"Never-worked\" | — | — |\n| education | str | education level label | — | one-to-one with education.num |\n| marital.status | str | \"Married-civ-spouse\", \"Never-married\", \"Divorced\", \"Separated\", \"Widowed\", \"Married-spouse-absent\", \"Married-AF-spouse\" | — | — |\n| occupation | str | occupation label | — | — |\n| relationship | str | \"Husband\", \"Not-in-family\", \"Own-child\", \"Unmarried\", \"Wife\", \"Other-relative\" | — | \"Husband\" implies sex \"Male\", \"Wife\" implies sex \"Female\" |\n| race | str | \"White\", \"Black\", \"Asian-Pac-Islander\", \"Amer-Indian-Eskimo\", \"Other\" | — | — |\n| sex | str | \"Male\", \"Female\" | — | consistent with relationship |\n| native.country | str | native country name | — | — |\n| income | str | \"<=50K\", \">50K\" | \"<=50K\": 75.92%, \">50K\": 24.08% | — |\n\n# CONSTRAINTS\n1. Output must be strictly valid JSON: all numeric values must be plain numbers with no leading zeros, no underscores, no thousand separators, and no code-like syntax of any kind.",
+    "assistant": "```json\n"
+  },
+  "datasets": [
+    {
+      "file": "adult_ft_100pct.json",
+      "description": "Fine-Tuning 100%",
+      "sample": null
+    },
+    {
+      "file": "adult_ft_50pct.json",
+      "description": "Fine-Tuning 50%",
+      "sample": 0.5
+    },
+    {
+      "file": "adult_ft_10pct.json",
+      "description": "Fine-Tuning 10%",
+      "sample": 0.1
+    },
+    {
+      "file": "adult_icl_fs_100r.json",
+      "description": "Few-shot ICL 100 records",
+      "sample": 100
+    },
+    {
+      "file": "adult_icl_fs_50r.json",
+      "description": "Few-shot ICL 50 records",
+      "sample": 50
+    },
+    {
+      "file": "adult_icl_fs_10r.json",
+      "description": "Few-shot ICL 10 records",
+      "sample": 10
+    },
+    {
+      "file": "adult_icl_fs_5r.json",
+      "description": "Few-shot ICL 5 records",
+      "sample": 5
+    },
+    {
+      "file": "adult_icl_fs_1r.json",
+      "description": "Few-shot ICL 1 record",
+      "sample": 1
+    }
+  ],
+  "dataset": null,
+  "required_fields": {
+    "age": "int",
+    "workclass": "str",
+    "fnlwgt": "int",
+    "education": "str",
+    "education.num": "int",
+    "marital.status": "str",
+    "occupation": "str",
+    "relationship": "str",
+    "race": "str",
+    "sex": "str",
+    "capital.gain": "int",
+    "capital.loss": "int",
+    "hours.per.week": "int",
+    "native.country": "str",
+    "income": "str"
+  },
+  "nullable_fields": [],
+  "seed": 0,
+  "num_samples": 10000,
+  "max_new_tokens": 1024,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "repetition_penalty": 1.05,
+  "dp": false
+}
