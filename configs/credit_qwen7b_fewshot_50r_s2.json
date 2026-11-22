@@ -1,0 +1,145 @@
+{
+  "dataset_name": "pointe77/credit-card-transaction",
+  "dataset_seed": 2,
+  "dataset_dir": "../dataset_s2",
+  "output_dir": "../outputs",
+  "original_dataset": "cct_ft_100pct.json",
+  "drop_columns": [
+    "trans_date_trans_time"
+  ],
+  "str_fillna_columns": [
+    "zip"
+  ],
+  "int_to_str_columns": [
+    "merch_zipcode"
+  ],
+  "str_to_int_columns": [],
+  "str_to_float_columns": [],
+  "float_to_int_columns": [],
+  "num_cols": [
+    "amt",
+    "lat",
+    "long",
+    "merch_lat",
+    "merch_long",
+    "city_pop",
+    "unix_time"
+  ],
+  "cat_cols": [
+    "category",
+    "gender",
+    "state",
+    "job"
+  ],
+  "nn_cols": [
+    "amt",
+    "lat",
+    "long",
+    "merch_lat",
+    "merch_long",
+    "city_pop"
+  ],
+  "label_analysis": {
+    "enabled": true,
+    "label_col": "is_fraud",
+    "amount_col": "amt",
+    "category_col": "category"
+  },
+  "geo_analysis": {
+    "enabled": true,
+    "lat": "lat",
+    "lon": "long",
+    "merch_lat": "merch_lat",
+    "merch_lon": "merch_long"
+  },
+  "temporal_analysis": {
+    "enabled": true,
+    "unix_time_col": "unix_time",
+    "label_col": "is_fraud"
+  },
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "strategy": "few_shot_icl_50r",
+  "prompt": {
+    "system": "You are a synthetic data generator API. Output ONLY a valid JSON object.\nNo thinking, no reasoning, no explanation, no text before or after.\nAny output outside the JSON block is a failure.",
+    "user": "Generate EXACTLY one NEW synthetic credit card transaction record.\n\n# SCHEMA\n\n## Numeric\n\n| Field | Type | Range | Distribution | Relations |\n|---|---|---|---|---|\n| Unnamed: 0 | int | [0, 1296674] | — | — |\n| cc_num | int | [60416207185, 4992346398065154048] | — | — |\n| amt | float | [1.00, 28948.90], 2 decimals | q25=9.65, median=47.52, q75=83.14, mean=70.35 | — |\n| lat | float | [20.027, 66.693] | q25=34.620, median=39.354, q75=41.940, mean=38.538 | consistent with city, state, zip |\n| long | float | [-165.672, -67.950] | q25=-96.798, median=-87.477, q75=-80.158, mean=-90.226 | consistent with city, state, zip; strongly negatively correlated with zip |\n| city_pop | int | [23, 2906700] | q25=743, median=2456, q75=20328, mean=88824.44 | consistent with city |\n| unix_time | int | [1325376018, 1371816817] | q25=1338750742, median=1349249747, q75=1359385376, mean=1349243636.73 | — |\n| merch_lat | float | [19.028, 67.510] | q25=34.734, median=39.366, q75=41.957, mean=38.537 | differs from lat by less than 1.0 degree |\n| merch_long | float | [-166.671, -66.951] | q25=-96.897, median=-87.438, q75=-80.237, mean=-90.226 | differs from long by less than 1.0 degree |\n\n## Categorical\n\n| Field | Type | Values | Distribution | Relations |\n|---|---|---|---|---|\n| category | str | \"gas_transport\", \"grocery_pos\", \"home\", \"shopping_pos\", \"kids_pets\", \"shopping_net\", \"entertainment\", \"food_dining\", \"personal_care\", \"health_fitness\", \"misc_pos\", \"misc_net\", \"grocery_net\", \"travel\" | — | — |\n| gender | str | \"F\", \"M\" | — | — |\n| job | str | realistic English job title | — | — |\n| state | str | 2-letter US state code | — | consistent with city, zip, lat, long |\n| is_fraud | int | 0, 1 | 0: 99.42%, 1: 0.58% | — |\n\n## Text\n\n| Field | Type | Format / description | Relations |\n|---|---|---|---|\n| merchant | str | \"fraud_[Surname] LLC\" / \"PLC\" / \"Ltd\" / \"Inc\" / \"Group\", \"fraud_[Surname]-[Surname]\", \"fraud_[Surname], [Surname] and [Surname]\", \"fraud_[Surname] and Sons\" | — |\n| first | str | common US first name | — |\n| last | str | common US surname | — |\n| street | str | \"<number> <Name> <street type>\", optionally followed by \"Suite <n>\" or \"Apt. <n>\" | — |\n| city | str | US city | consistent with state, zip, lat, long |\n| dob | str | \"YYYY-MM-DD\", birth years 1924–2005 | age at the transaction date (unix_time) between 7 and 89 years |\n| trans_num | str | exactly 32 lowercase hexadecimal characters, no dashes | — |\n| zip | str | string of digits, no leading zeros | consistent with state; low zip (East Coast) goes with long near -70, high zip (West Coast) with long near -120 |\n| merch_zipcode | str | string of digits, no leading zeros; \"\" when absent (present in 84.9% of records), never null | close to zip (median difference about 400) |\n\n# CONSTRAINTS\n1. Output must be strictly valid JSON: all numeric values must be plain numbers with no leading zeros, no underscores, no thousand separators, and no code-like syntax of any kind.\n2. zip and merch_zipcode MUST always be JSON strings. Output \"\" (empty string) for merch_zipcode when the value is absent; never use JSON null, the string \"null\", or NaN.",
+    "assistant": "```json\n"
+  },
+  "datasets": [
+    {
+      "file": "cct_ft_100pct.json",
+      "description": "Fine-Tuning 100%",
+      "sample": null
+    },
+    {
+      "file": "cct_ft_50pct.json",
+      "description": "Fine-Tuning 50%",
+      "sample": 0.5
+    },
+    {
+      "file": "cct_ft_10pct.json",
+      "description": "Fine-Tuning 10%",
+      "sample": 0.1
+    },
+    {
+      "file": "cct_icl_fs_100r.json",
+      "description": "Few-shot ICL 100 records",
+      "sample": 100
+    },
+    {
+      "file": "cct_icl_fs_50r.json",
+      "description": "Few-shot ICL 50 records",
+      "sample": 50
+    },
+    {
+      "file": "cct_icl_fs_10r.json",
+      "description": "Few-shot ICL 10 records",
+      "sample": 10
+    },
+    {
+      "file": "cct_icl_fs_5r.json",
+      "description": "Few-shot ICL 5 records",
+      "sample": 5
+    },
+    {
+      "file": "cct_icl_fs_1r.json",
+      "description": "Few-shot ICL 1 record",
+      "sample": 1
+    }
+  ],
+  "dataset": null,
+  "required_fields": {
+    "Unnamed: 0": "int",
+    "cc_num": "int",
+    "merchant": "str",
+    "category": "str",
+    "amt": "float",
+    "first": "str",
+    "last": "str",
+    "gender": "str",
+    "street": "str",
+    "city": "str",
+    "state": "str",
+    "zip": "str",
+    "lat": "float",
+    "long": "float",
+    "city_pop": "int",
+    "job": "str",
+    "dob": "str",
+    "trans_num": "str",
+    "unix_time": "int",
+    "merch_lat": "float",
+    "merch_long": "float",
+    "is_fraud": "int",
+    "merch_zipcode": "str"
+  },
+  "nullable_fields": [
+    "merch_zipcode"
+  ],
+  "seed": 2,
+  "num_samples": 10000,
+  "max_new_tokens": 1024,
+  "temperature": 0.8,
+  "top_p": 0.95,
+  "repetition_penalty": 1.05,
+  "dp": false
+}
