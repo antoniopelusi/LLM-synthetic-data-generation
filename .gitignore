@@ -1,0 +1,6 @@
+.venv/
+.ipynb_checkpoints/
+
+dataset/
+outputs/
+.DS_Store
